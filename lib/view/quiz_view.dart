@@ -30,6 +30,11 @@ class _QuizViewState extends State<QuizView> {
   _QuizViewState(this._questions);
   int _questionIndex = 0;
 
+  /// Get the number of questions that have been given an answer, for the progress bar.
+  int _getNumQuestionsAnswered() {
+    return _questions.where((element) => (element as Question).hasResponse as bool).length;
+  }
+
   /// Move to the next question and redraw the widget.
   void _nextQuestion(){
     setState(() => _questionIndex = (_questionIndex + 1) % _questions.length);
@@ -57,7 +62,7 @@ class _QuizViewState extends State<QuizView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${_questionIndex+1}/${_questions.length}'),
+        title: Text('Question ${_questionIndex+1}/${_questions.length}'),
         actions: [
           if (_questions.length > 1) ...[
             IconButton(
@@ -79,6 +84,16 @@ class _QuizViewState extends State<QuizView> {
         bottom: false,
         child: ListView(
           children: [
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text('Number of questions answered: ${_getNumQuestionsAnswered()}/${_questions.length}'),
+              ),
+            ),
+            LinearProgressIndicator(
+              value: _getNumQuestionsAnswered() / _questions.length,
+              color: _getNumQuestionsAnswered() == _questions.length ? Colors.green : null,
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: /*Text(_currQuestion.stem),*/ Html(data: _currQuestion.stem)
